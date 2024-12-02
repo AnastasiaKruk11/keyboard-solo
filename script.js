@@ -1,5 +1,4 @@
-const word = document.querySelector('.word');
-let letters = Array.from(document.querySelectorAll('.word span'));
+const wordHolder = document.querySelector('.word');
 const letterFaultCounter = document.querySelector('.word-mistakes');
 const correctWordsCounter = document.querySelector('.correct-count');
 const wrongWordsCounter = document.querySelector('.wrong-count');
@@ -13,9 +12,11 @@ let timerRun;
 
 let letterCounter = 0;
 
-const words = ['wind', 'tree', 'programmer', 'glass', 'water', 'yellow', 'book', 'winter', 'education', 'picture', 'december', 'flower', 'phone', 'adventure', 'computer', 'kitten', 'smile', 'happiness'];
+const words = ['wind', 'tree', 'programmer', 'glass', 'water', 'codegirl', 'yellow', 'book', 'winter', 'education', 'picture', 'december', 'flower', 'phone', 'adventure', 'computer', 'kitten', 'smile', 'happiness', 'friend', 'mirror'];
 
 document.addEventListener('keydown', (event) => {
+    const letters = Array.from(document.querySelectorAll('.word span'));
+    console.log(letters);
     let currentLetter = letters[letterCounter];
     const keyValue = event.key;
 
@@ -29,22 +30,14 @@ document.addEventListener('keydown', (event) => {
     };
 
     if (letterCounter === letters.length) {
-
-        if (+(letterFaultCounter.textContent) > 0) {
-            wrongWordsCounter.textContent++;
-        } else {
-            correctWordsCounter.textContent++;
-        };
-
-        letterCounter = 0;
-        letterFaultCounter.textContent = 0;
-        letters = getRandomWord(words);
-        word.textContent = letters;
+        nextWord();
     };
 
     if (correctWordsCounter.textContent === '0' && letterCounter === 1 && wrongWordsCounter.textContent === '0') {
 
         timerRun = setInterval(() => {
+
+            minutes = timerClock[0];
             seconds++;
 
             if (seconds > 59) {
@@ -58,17 +51,37 @@ document.addEventListener('keydown', (event) => {
 
         }, 1000);
 
-    } else if (correctWordsCounter.textContent === '6' && letterCounter === 0) {
-        alert(`Победа! Ваше время ${minutes}:${seconds}`);
-        clearInterval(timerRun);
-        minutes = 0;
-        seconds = 0;
-        timer.innerText = `0${minutes}:0${seconds}`;
-        correctWordsCounter.textContent = 0;
-        wrongWordsCounter.textContent = 0;
+    } else if (correctWordsCounter.textContent === '5' && letterCounter === 0) {
+        restartGame();
     };
 });
 
+function renderWord(word) {
+    wordHolder.innerHTML = word.split('').map((char) => `<span>${char}</span>`).join('');
+};
+
 function getRandomWord(arr) {
     return arr[Math.ceil(Math.random() * (arr.length - 1))];
-}
+};
+
+function nextWord() {
+    renderWord(getRandomWord(words));
+    if (+(letterFaultCounter.textContent) > 0) {
+        wrongWordsCounter.textContent++;
+    } else {
+        correctWordsCounter.textContent++;
+    };
+
+    letterCounter = 0;
+    letterFaultCounter.textContent = 0;
+};
+
+function restartGame() {
+    alert(`Победа! Ваше время ${minutes}:${seconds}`);
+    clearInterval(timerRun);
+    minutes = 0;
+    seconds = 0;
+    timer.innerText = `0${minutes}:0${seconds}`;
+    correctWordsCounter.textContent = 0;
+    wrongWordsCounter.textContent = 0;
+};
