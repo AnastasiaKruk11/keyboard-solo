@@ -9,6 +9,7 @@ const timerClock = timer.innerText.split(':');
 let minutes = timerClock[0];
 let seconds = timerClock[1];
 let timerRun;
+let timerMode = 'off';
 
 let letterCounter = 0;
 
@@ -16,8 +17,7 @@ const words = ['wind', 'tree', 'programmer', 'glass', 'water', 'codegirl', 'yell
 
 document.addEventListener('keydown', (event) => {
     const letters = Array.from(document.querySelectorAll('.word span'));
-    console.log(letters);
-    let currentLetter = letters[letterCounter];
+    const currentLetter = letters[letterCounter];
     const keyValue = event.key;
 
     if (keyValue === currentLetter.textContent) {
@@ -30,18 +30,24 @@ document.addEventListener('keydown', (event) => {
     };
 
     if (letterCounter === letters.length) {
-        nextWord();
+
+        if (+(letterFaultCounter.textContent) > 0) {
+            wrongWordsCounter.textContent++;
+        } else {
+            correctWordsCounter.textContent++;
+        };
+        setTimeout(nextWord, 0);
     };
 
-    if (correctWordsCounter.textContent === '0' && letterCounter === 1 && wrongWordsCounter.textContent === '0') {
+    if (timerMode === 'off') {
 
+        timerMode = 'on';
         timerRun = setInterval(() => {
 
-            minutes = timerClock[0];
             seconds++;
 
             if (seconds > 59) {
-                seconds = 0;
+                seconds = '00';
                 minutes++;
             } else if (seconds < 10) {
                 seconds = '0' + seconds;
@@ -50,9 +56,6 @@ document.addEventListener('keydown', (event) => {
             timer.innerText = `${minutes}:${seconds}`;
 
         }, 1000);
-
-    } else if (correctWordsCounter.textContent === '5' && letterCounter === 0) {
-        restartGame();
     };
 });
 
@@ -65,23 +68,29 @@ function getRandomWord(arr) {
 };
 
 function nextWord() {
+    checkGameOver();
     renderWord(getRandomWord(words));
-    if (+(letterFaultCounter.textContent) > 0) {
-        wrongWordsCounter.textContent++;
-    } else {
-        correctWordsCounter.textContent++;
-    };
-
     letterCounter = 0;
     letterFaultCounter.textContent = 0;
 };
 
 function restartGame() {
-    alert(`Победа! Ваше время ${minutes}:${seconds}`);
     clearInterval(timerRun);
-    minutes = 0;
-    seconds = 0;
-    timer.innerText = `0${minutes}:0${seconds}`;
+    timerMode = 'off';
+    minutes = '00';
+    seconds = '00';
+    timer.innerText = `${minutes}:${seconds}`;
     correctWordsCounter.textContent = 0;
     wrongWordsCounter.textContent = 0;
+};
+
+function checkGameOver() {
+    if (+correctWordsCounter.textContent === 5) {
+        alert(`Победа! Ваше время ${minutes}:${seconds}`);
+        restartGame();
+    };
+    if (+wrongWordsCounter.textContent === 5) {
+        alert(`Вы проиграли :(`);
+        restartGame();
+    }
 };
